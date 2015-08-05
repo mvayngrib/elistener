@@ -2,9 +2,11 @@ var EventEmitter = require('events').EventEmitter
 var elistener = require('./')
 
 var cat = new EventEmitter()
-var owner = {}
-elistener.install(owner) // or just elistener(owner)
 
+function Owner () {}
+elistener.install(Owner.prototype) // or just elistener(Owner.prototype)
+
+var owner = new Owner()
 owner.listenTo(cat, 'meow', feed)
 cat.emit('meow')
 cat.emit('meow')
