@@ -1,6 +1,6 @@
 {
   "name": "elistener",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "listenTo/stopListening to an EventEmitter for easy cleanup",
   "main": "index.js",
   "scripts": {
