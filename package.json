@@ -1,0 +1,20 @@
+{
+  "name": "elistener",
+  "version": "1.0.0",
+  "description": "listenTo/stopListening to an EventEmitter for easy cleanup",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test",
+    "style": "standard"
+  },
+  "pre-commit": [
+    "style",
+    "test"
+  ],
+  "author": "Mark Vayngrib <mark.vayngrib@lablz.com> (http://github.com/mvayngrib)",
+  "license": "ISC",
+  "devDependencies": {
+    "pre-commit": "^1.1.1",
+    "tape": "^4.0.2"
+  }
+}
