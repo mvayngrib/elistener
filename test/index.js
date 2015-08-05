@@ -44,6 +44,12 @@ test('basic listen/stopListening', function (t) {
   shouldHear = false
   e.emit(event, eventArg)
 
+  listener.listenOnce(e, event, helloHandler)
+  shouldHear = true
+  e.emit(event, eventArg)
+  shouldHear = false
+  e.emit(event, eventArg)
+
   t.end()
 })
 
