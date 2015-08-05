@@ -11,6 +11,14 @@
     "style",
     "test"
   ],
+  "keywords": [
+    "events",
+    "cleanup",
+    "listen",
+    "stopListening",
+    "listenOnce",
+    "EventEmitter"
+  ],
   "author": "Mark Vayngrib <mark.vayngrib@lablz.com> (http://github.com/mvayngrib)",
   "license": "ISC",
   "devDependencies": {
