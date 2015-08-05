@@ -2,29 +2,38 @@
 // based on Backbone.JS listenTo/stopListening
 
 var EventEmitter = require('events').EventEmitter
-var ID_PROP = '_cleanListenId'
+var ID_PROP = '_elistenerId'
+var LISTENERS_PROP = '_elisteners'
+var count = 0
 
 module.exports = mixin
 module.exports.install = mixin
 
 function mixin (obj) {
-  var count = 0
-  var allListeners = {}
-
-  if (obj.listen || obj.stopListening) {
+  if (obj.listenTo || obj.stopListening) {
     throw new Error('refusing to override existing properties')
   }
 
   obj.listenTo = function (emitter, event, handler) {
+    var infos = this[LISTENERS_PROP]
+    if (!infos) {
+      infos = this[LISTENERS_PROP] = {}
+    }
+
     ensureEmitter(emitter)
     if (!(ID_PROP in emitter)) {
       emitter[ID_PROP] = count++
     }
 
     var id = emitter[ID_PROP]
-    if (!allListeners[id]) allListeners[id] = {}
+    if (!infos[id]) {
+      infos[id] = {
+        emitter: emitter,
+        listeners: {}
+      }
+    }
 
-    var listeners = allListeners[id]
+    var listeners = infos[id].listeners
     if (!listeners[event]) {
       listeners[event] = []
     }
@@ -34,17 +43,27 @@ function mixin (obj) {
   }
 
   obj.stopListening = function (emitter, event, handler) {
+    var infos = this[LISTENERS_PROP]
+    if (!infos) {
+      throw new Error('not listening to anything')
+    }
+
     var id
-    var listeners
+    var info
     if (emitter) {
       ensureEmitter(emitter)
       id = emitter[ID_PROP]
-      listeners = allListeners[id]
+      info = infos[id]
+      if (emitter !== info.emitter) {
+        throw new Error('emitter id was compromised')
+      }
+
       ensureSubscribed(id)
     } else {
       // stop listening to everything
-      for (id in allListeners) {
-        stopListeningToEmitter(emitter, listeners)
+      for (id in infos) {
+        info = infos[id]
+        stopListeningToEmitter(info.emitter, info.listeners)
       }
 
       return
@@ -53,17 +72,17 @@ function mixin (obj) {
     if (!event) {
       // stop listening to an emitter
       ensureSubscribed(id)
-      stopListeningToEmitter(emitter, listeners)
+      stopListeningToEmitter(emitter, info.listeners)
       return
     }
 
     if (!handler) {
       // remove a single listener
-      stopListeningToEvent(emitter, listeners, event)
+      stopListeningToEvent(emitter, info.listeners, event)
       return
     }
 
-    var handlers = listeners[event]
+    var handlers = info.listeners[event]
     var idx = handlers.indexOf(handler)
     if (idx !== -1) {
       handlers.splice(idx, 1)
@@ -72,10 +91,11 @@ function mixin (obj) {
   }
 
   obj.listenOnce = function (emitter, event, handler) {
-    obj.listenTo(emitter, event, oneTimeThang)
+    var self = this
+    this.listenTo(emitter, event, oneTimeThang)
 
     function oneTimeThang () {
-      obj.stopListening(emitter, event, oneTimeThang)
+      self.stopListening(emitter, event, oneTimeThang)
       handler.apply(null, arguments)
     }
   }

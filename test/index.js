@@ -89,3 +89,29 @@ test('multi stopListening', function (t) {
 
   t.end()
 })
+
+test('prototype', function (t) {
+  var e = new EventEmitter()
+  var id = 0
+  var Listener = function () { this.id = id++ }
+  var event = 'hello'
+  toElistener(Listener.prototype)
+  var a = new Listener()
+  var b = new Listener()
+
+  var count = 0
+  a.listenTo(e, event, function () {
+    count++
+  })
+
+  b.listenTo(e, event, function () {
+    count++
+  })
+
+  e.emit(event)
+  t.equal(count, 2)
+  a.stopListening()
+  e.emit(event)
+  t.equal(count, 3)
+  t.end()
+})
