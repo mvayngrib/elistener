@@ -44,9 +44,7 @@ function mixin (obj) {
 
   obj.stopListening = function (emitter, event, handler) {
     var infos = this[LISTENERS_PROP]
-    if (!infos) {
-      throw new Error('not listening to anything')
-    }
+    if (!infos) return
 
     var id
     var info
